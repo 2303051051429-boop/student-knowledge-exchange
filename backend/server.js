@@ -41,8 +41,11 @@ const uploadDir = IS_SERVERLESS
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 app.use('/uploads', express.static(uploadDir));
 
-// Serve frontend
-app.use(express.static(path.join(__dirname, '..', 'frontend')));
+// Note: frontend is served as static assets by Vercel CDN directly.
+// Express only handles /api/* routes in production.
+if (!process.env.VERCEL) {
+  app.use(express.static(path.join(__dirname, '..', 'frontend')));
+}
 
 
 // ── API Routes ──────────────────────────────────────────────
@@ -60,10 +63,12 @@ app.use('/api/leaderboard',   leaderboardRoutes);
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date() }));
 
-// SPA fallback
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
-});
+// SPA fallback — only when running locally (Vercel handles routing via vercel.json)
+if (!process.env.VERCEL) {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
+  });
+}
 
 // ── Socket.io Real-time ─────────────────────────────────────
 const { initSocket } = require('./utils/notificationHelper');

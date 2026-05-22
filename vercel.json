@@ -2,20 +2,53 @@
   "version": 2,
   "builds": [
     {
+      "src": "frontend/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "backend/server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": [
-          "frontend/**",
-          "backend/**"
-        ]
+        "includeFiles": ["backend/**"]
       }
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "backend/server.js"
+    },
+    {
+      "src": "/uploads/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/socket.io/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf))",
+      "dest": "frontend/$1"
+    },
+    {
+      "src": "/explore",
+      "dest": "frontend/explore.html"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "frontend/dashboard.html"
+    },
+    {
+      "src": "/messages",
+      "dest": "frontend/messages.html"
+    },
+    {
+      "src": "/leaderboard",
+      "dest": "frontend/leaderboard.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/index.html"
     }
   ]
 }
