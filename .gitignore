@@ -5,3 +5,35 @@ node_modules/
 *.db-journal
 *.db-wal
 *.db-shm
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Env
+.env.local
+.env.*
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# Build
+dist/
+build/
+
+# Uploads
+uploads/
+
+# OneDrive temp
+~$*
+
+# Coverage
+coverage/
+
+# Misc
+*.sqlite3
