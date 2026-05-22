@@ -42,13 +42,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded avatars — use /tmp on Vercel (bundle dir is read-only)
+// Serve uploaded avatars — skip dir creation on Vercel (not persistent anyway)
 const IS_SERVERLESS = !!(process.env.VERCEL || process.env.RAILWAY_ENVIRONMENT);
-const uploadDir = IS_SERVERLESS
-  ? '/tmp/uploads'
-  : path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = IS_SERVERLESS ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+if (!IS_SERVERLESS) {
+  try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) { /* ignore */ }
+}
 app.use('/uploads', express.static(uploadDir));
+
 
 // Note: frontend is served as static assets by Vercel CDN directly.
 // Express only handles /api/* routes in production.
