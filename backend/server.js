@@ -63,6 +63,24 @@ app.use('/api/leaderboard',   leaderboardRoutes);
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date() }));
 
+// Diagnostic route — shows full error details (remove after debugging)
+app.get('/api/debug', (req, res) => {
+  try {
+    const db = require('./database/db').getDB();
+    const count = db.prepare('SELECT COUNT(*) as c FROM users').get();
+    res.json({ status: 'ok', userCount: count.c, node: process.version, vercel: !!process.env.VERCEL });
+  } catch (err) {
+    res.status(500).json({ error: err.message, stack: err.stack });
+  }
+});
+
+// Global error handler — returns JSON so we can read it
+app.use((err, req, res, next) => {
+  console.error('Global error:', err);
+  res.status(500).json({ error: err.message, stack: err.stack });
+});
+
+
 // SPA fallback — only when running locally (Vercel handles routing via vercel.json)
 if (!process.env.VERCEL) {
   app.get('*', (req, res) => {
