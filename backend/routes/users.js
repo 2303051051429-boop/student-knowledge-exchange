@@ -6,14 +6,17 @@ const auth = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Multer config for avatar uploads
+// Multer config for avatar uploads — /tmp on Vercel (bundle dir is read-only)
+const IS_SERVERLESS = !!(process.env.VERCEL || process.env.RAILWAY_ENVIRONMENT);
+const UPLOAD_DIR = IS_SERVERLESS ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads');
 const storage = multer.diskStorage({
-  destination: path.join(__dirname, '..', 'uploads'),
+  destination: UPLOAD_DIR,
   filename: (req, file, cb) => {
     cb(null, `avatar_${req.params.id}_${Date.now()}${path.extname(file.originalname)}`);
   }
 });
 const upload = multer({ storage, limits: { fileSize: 2 * 1024 * 1024 } });
+
 
 // GET /api/users/:id — Public profile
 router.get('/:id', (req, res) => {

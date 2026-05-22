@@ -33,13 +33,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded avatars
-const uploadDir = path.join(__dirname, 'uploads');
+// Serve uploaded avatars — use /tmp on Vercel (bundle dir is read-only)
+const IS_SERVERLESS = !!(process.env.VERCEL || process.env.RAILWAY_ENVIRONMENT);
+const uploadDir = IS_SERVERLESS
+  ? '/tmp/uploads'
+  : path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 app.use('/uploads', express.static(uploadDir));
 
 // Serve frontend
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
 
 // ── API Routes ──────────────────────────────────────────────
 app.use('/api/auth',          authRoutes);
