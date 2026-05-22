@@ -2,6 +2,9 @@
   "name": "skillswap-backend",
   "version": "1.0.0",
   "description": "SkillSwap peer-learning platform backend",
+  "engines": {
+    "node": "22.x"
+  },
   "main": "server.js",
   "scripts": {
     "dev": "node --watch server.js",

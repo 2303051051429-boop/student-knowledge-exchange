@@ -1,0 +1,12 @@
+{
+  "name": "student-knowledge-exchange",
+  "version": "1.0.0",
+  "description": "Peer-to-peer skill trading platform for college students",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js"
+  }
+}
