@@ -141,12 +141,16 @@ io.on('connection', (socket) => {
 });
 
 // ── Start ───────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`\n🚀 SkillSwap server running at http://localhost:${PORT}`);
-  console.log(`📡 Socket.io enabled`);
-  console.log(`🗄️  Database: SQLite`);
-  console.log(`📁 Frontend: http://localhost:${PORT}\n`);
-});
+// On Vercel: do NOT call server.listen() — Vercel provides its own HTTP server.
+// Export app so Vercel can invoke it as a serverless handler.
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3000;
+  server.listen(PORT, () => {
+    console.log(`\n🚀 SkillSwap server running at http://localhost:${PORT}`);
+    console.log(`📡 Socket.io enabled`);
+    console.log(`🗄️  Database: SQLite`);
+    console.log(`📁 Frontend: http://localhost:${PORT}\n`);
+  });
+}
 
-module.exports = { app, io };
+module.exports = { app, server, io };
