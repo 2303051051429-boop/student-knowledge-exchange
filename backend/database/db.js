@@ -2,16 +2,17 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 require('dotenv').config();
 
-// On Vercel/serverless: use /tmp (only writable dir). Locally: use project db file.
+// On Vercel: use in-memory SQLite (:memory:) to avoid EROFS filesystem errors.
+// Data auto-seeds on every cold start (demo data is always fresh).
+// Locally: use a real file-based DB for persistence.
 const IS_SERVERLESS = !!(process.env.VERCEL || process.env.RAILWAY_ENVIRONMENT);
-const DB_FILE = IS_SERVERLESS ? '/tmp/skillswap.db' : path.resolve(__dirname, 'skillswap.db');
+const DB_FILE = IS_SERVERLESS ? ':memory:' : path.resolve(__dirname, 'skillswap.db');
 let db;
 
 function getDB() {
   if (!db) {
     db = new DatabaseSync(DB_FILE);
-    // WAL mode needs write access beside the DB file — disabled on Vercel (EROFS).
-    // Use DELETE journal mode on serverless, WAL only when we have a writable FS.
+    // WAL requires write access beside the DB file — only safe locally.
     if (!IS_SERVERLESS) db.exec('PRAGMA journal_mode = WAL');
     db.exec('PRAGMA foreign_keys = ON');
   }
