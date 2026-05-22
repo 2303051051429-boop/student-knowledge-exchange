@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — SkillSwap</title>
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="stylesheet" href="/styles/modal.css">
+<link rel="stylesheet" href="/styles/animations.css">
+<link rel="stylesheet" href="/styles/dashboard.css">
+</head>
+<body>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <a href="/" class="nav-logo">Skill<span>Swap</span></a>
+  <ul class="nav-links">
+    <li><a href="/explore.html">Explore</a></li>
+    <li><a href="/leaderboard.html">Leaderboard</a></li>
+    <!-- Auth items injected by JS -->
+  </ul>
+</nav>
+
+<div class="dash-layout">
+  
+  <!-- Sidebar -->
+  <div class="dash-sidebar">
+    <div class="dash-profile-card">
+      <div class="dash-avatar" id="dashAvatar"></div>
+      <div class="dash-user-name" id="dashName">Loading...</div>
+      <div class="dash-user-uni" id="dashUni">...</div>
+      <div class="dash-xp-bar">
+        <div class="dash-xp-label"><span>XP Progress</span><span id="dashXpVal">0 XP</span></div>
+        <div class="dash-xp-track"><div class="dash-xp-fill" id="dashXpFill" style="width:0%"></div></div>
+      </div>
+    </div>
+    
+    <div class="dash-nav">
+      <div class="dash-nav-item active" data-target="overview" onclick="switchPanel('overview')">
+        <span class="dash-nav-icon">📊</span> Overview
+      </div>
+      <div class="dash-nav-item" data-target="sessions" onclick="switchPanel('sessions')">
+        <span class="dash-nav-icon">📅</span> My Sessions
+      </div>
+      <div class="dash-nav-item" onclick="window.location.href='/messages.html'">
+        <span class="dash-nav-icon">💬</span> Messages
+      </div>
+      <div class="dash-nav-item" data-target="challenges" onclick="switchPanel('challenges')">
+        <span class="dash-nav-icon">🏆</span> Challenges
+      </div>
+      <div class="dash-nav-item" data-target="settings" onclick="switchPanel('settings')">
+        <span class="dash-nav-icon">⚙️</span> Settings
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="dash-main">
+    
+    <!-- Overview Panel -->
+    <div class="dash-panel active" id="panel-overview">
+      <div class="dash-welcome-bar">
+        <div class="dash-welcome">
+          <h1 id="welcomeTitle">Welcome back, <em>User</em></h1>
+          <p>Here's what's happening with your learning journey.</p>
+        </div>
+      </div>
+      
+      <div class="dash-stats">
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon">🎓</div>
+          <div class="dash-stat-num" id="statTaught">0</div>
+          <div class="dash-stat-label">Sessions Taught</div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon">📚</div>
+          <div class="dash-stat-num" id="statTaken">0</div>
+          <div class="dash-stat-label">Sessions Taken</div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon">⭐</div>
+          <div class="dash-stat-num" id="statRating">0.0</div>
+          <div class="dash-stat-label">Avg Rating</div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon">🪙</div>
+          <div class="dash-stat-num" id="statCredits">0</div>
+          <div class="dash-stat-label">Credits</div>
+        </div>
+      </div>
+
+      <h3 style="font-family:var(--font-display);font-size:18px;font-weight:700;margin-bottom:16px;">Next Upcoming Session</h3>
+      <div id="nextSessionContainer">
+        <div class="card" style="padding:20px;text-align:center;color:var(--ink-faint);font-style:italic;">No upcoming sessions</div>
+      </div>
+    </div>
+
+    <!-- Sessions Panel -->
+    <div class="dash-panel" id="panel-sessions">
+      <h2 style="font-family:var(--font-display);font-size:24px;font-weight:900;margin-bottom:20px;">My Sessions</h2>
+      
+      <div class="auth-tabs" style="margin-bottom:24px;border-bottom:2px solid var(--card-border);">
+        <button class="auth-tab active" data-stab="upcoming" onclick="switchSessionTab('upcoming')">Upcoming</button>
+        <button class="auth-tab" data-stab="past" onclick="switchSessionTab('past')">Past</button>
+        <button class="auth-tab" data-stab="cancelled" onclick="switchSessionTab('cancelled')">Cancelled</button>
+      </div>
+
+      <div class="session-list" id="sessionsListContainer">
+        <div class="skeleton" style="height:100px;"></div>
+        <div class="skeleton" style="height:100px;"></div>
+      </div>
+    </div>
+
+    <!-- Challenges Panel -->
+    <div class="dash-panel" id="panel-challenges">
+      <h2 style="font-family:var(--font-display);font-size:24px;font-weight:900;margin-bottom:8px;">Challenges & Badges</h2>
+      <p style="font-size:14px;color:var(--ink-faint);margin-bottom:24px;">Complete challenges to earn XP and unlock badges for your profile.</p>
+      
+      <div class="badges-grid" id="badgesGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="dash-panel" id="panel-settings">
+      <h2 style="font-family:var(--font-display);font-size:24px;font-weight:900;margin-bottom:24px;">Profile Settings</h2>
+      
+      <div class="card" style="padding:24px;max-width:600px;">
+        <form id="settingsForm" onsubmit="handleSaveSettings(event)">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="set-name" required>
+          </div>
+          <div class="form-group">
+            <label>University</label>
+            <input type="text" id="set-uni">
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <textarea id="set-bio" rows="4"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/dashboard.js"></script>
+
+</body>
+</html>

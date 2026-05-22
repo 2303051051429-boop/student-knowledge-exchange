@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages — SkillSwap</title>
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="stylesheet" href="/styles/modal.css">
+<link rel="stylesheet" href="/styles/animations.css">
+<link rel="stylesheet" href="/styles/chat.css">
+<!-- Include Socket.io -->
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <a href="/" class="nav-logo">Skill<span>Swap</span></a>
+  <ul class="nav-links">
+    <li><a href="/explore.html">Explore</a></li>
+    <li><a href="/dashboard.html">Dashboard</a></li>
+    <!-- Auth items injected by JS -->
+  </ul>
+</nav>
+
+<div class="chat-layout">
+  
+  <!-- Sidebar -->
+  <div class="chat-sidebar" id="chatSidebar">
+    <div class="chat-sidebar-header">
+      <h2>Messages</h2>
+      <input type="text" class="chat-search" id="chatSearch" placeholder="Search conversations...">
+    </div>
+    
+    <div class="chat-list" id="chatList">
+      <div class="skeleton" style="height:60px;margin:10px;"></div>
+      <div class="skeleton" style="height:60px;margin:10px;"></div>
+    </div>
+  </div>
+
+  <!-- Main Chat Area -->
+  <div class="chat-main" id="chatMain">
+    
+    <!-- Empty State -->
+    <div class="chat-empty" id="chatEmpty">
+      <div class="chat-empty-icon">💬</div>
+      <h3>Your Messages</h3>
+      <p>Select a conversation from the sidebar to start chatting.</p>
+    </div>
+
+    <!-- Active Chat (hidden by default) -->
+    <div id="chatActive" style="display:none; flex-direction:column; height:100%;">
+      <div class="chat-main-header">
+        <button class="chat-header-btn" style="display:none;" id="chatBackBtn">←</button>
+        <div class="chat-item-avatar" id="partnerAvatar"></div>
+        <div class="chat-partner-info">
+          <div class="chat-partner-name" id="partnerName">Loading...</div>
+          <div class="chat-partner-status" id="partnerStatus">Offline</div>
+        </div>
+      </div>
+      
+      <div class="chat-messages" id="chatMessages">
+        <!-- Messages injected here -->
+      </div>
+      
+      <div class="chat-input-area">
+        <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1"></textarea>
+        <button class="chat-send-btn" id="chatSendBtn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/chat.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+/* ═══════════════════════════════════════════════════
+   DASHBOARD STYLES (dashboard.css)
+═══════════════════════════════════════════════════ */
+
+.dash-layout {
+  display: grid; grid-template-columns: 260px 1fr;
+  min-height: calc(100vh - var(--nav-height));
+  margin-top: var(--nav-height);
+}
+
+/* Sidebar */
+.dash-sidebar {
+  background: var(--ink-primary);
+  padding: 28px 16px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: sticky; top: var(--nav-height);
+  height: calc(100vh - var(--nav-height));
+  overflow-y: auto;
+}
+.dash-profile-card {
+  text-align: center;
+  padding-bottom: 24px; margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.dash-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-saffron), var(--accent-teal));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 900;
+  font-size: 28px; color: #fff; margin: 0 auto 12px;
+  border: 3px solid rgba(255,255,255,0.15); overflow: hidden;
+}
+.dash-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.dash-user-name { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.dash-user-uni  { font-size: 12px; font-style: italic; color: rgba(255,255,255,0.4); }
+.dash-xp-bar { margin-top: 12px; }
+.dash-xp-label { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 1px; display: flex; justify-content: space-between; margin-bottom: 4px; }
+.dash-xp-track { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden; }
+.dash-xp-fill  { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent-teal), var(--accent-saffron)); transition: width 1s var(--ease-out-expo); }
+
+.dash-nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: 10px;
+  margin-bottom: 4px; cursor: pointer;
+  font-family: var(--font-body); font-size: 14px;
+  color: rgba(255,255,255,0.5); transition: all 0.2s;
+}
+.dash-nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+.dash-nav-item.active { background: rgba(232,160,32,0.15); color: var(--accent-saffron); }
+.dash-nav-icon { font-size: 18px; width: 24px; text-align: center; }
+.dash-nav-badge { margin-left: auto; background: var(--accent-rose); color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 10px; font-family: var(--font-mono); }
+
+/* Main content */
+.dash-main {
+  padding: 36px 40px;
+  background: var(--bg-page);
+  overflow-y: auto;
+}
+.dash-welcome-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 32px;
+}
+.dash-welcome h1 { font-family: var(--font-display); font-size: 28px; font-weight: 900; }
+.dash-welcome h1 em { font-style: italic; color: var(--accent-teal); }
+.dash-welcome p { font-size: 14px; font-style: italic; color: var(--ink-faint); margin-top: 4px; }
+
+/* Stats row */
+.dash-stats {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+  margin-bottom: 32px;
+}
+.dash-stat-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 12px; padding: 20px;
+  transition: transform 0.2s var(--ease-spring);
+}
+.dash-stat-card:hover { transform: translateY(-3px); }
+.dash-stat-icon { font-size: 24px; margin-bottom: 10px; }
+.dash-stat-num { font-family: var(--font-display); font-size: 32px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.dash-stat-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; color: var(--ink-faint); text-transform: uppercase; }
+
+/* Panels */
+.dash-panel { display: none; animation: fadeSlideIn 0.4s var(--ease-out-expo); }
+.dash-panel.active { display: block; }
+
+/* Sessions list */
+.session-list { display: flex; flex-direction: column; gap: 12px; }
+.session-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 12px; padding: 20px;
+  display: flex; align-items: center; gap: 16px;
+  transition: all 0.2s;
+}
+.session-card:hover { box-shadow: var(--shadow-sm); }
+.session-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-saffron), var(--accent-teal)); display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 16px; flex-shrink: 0; }
+.session-info { flex: 1; }
+.session-skill-name { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
+.session-meta { font-size: 13px; color: var(--ink-faint); margin-top: 2px; display: flex; gap: 12px; }
+.session-status { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; }
+.status-pending   { background: rgba(232,160,32,0.12); color: var(--accent-saffron); }
+.status-confirmed { background: rgba(14,124,108,0.12); color: var(--accent-teal); }
+.status-completed { background: rgba(27,35,64,0.08);   color: var(--ink-muted); }
+.status-cancelled { background: rgba(201,75,110,0.12); color: var(--accent-rose); }
+.session-actions { display: flex; gap: 8px; }
+.session-btn { padding: 8px 16px; border-radius: 6px; font-size: 12px; border: none; font-family: var(--font-body); font-weight: 600; cursor: pointer; transition: all 0.2s; }
+
+/* Badges grid */
+.badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.badge-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 12px; padding: 20px; text-align: center;
+  transition: transform 0.3s var(--ease-spring);
+}
+.badge-card:hover { transform: scale(1.05); }
+.badge-card.earned { border-color: var(--accent-saffron); background: rgba(232,160,32,0.04); }
+.badge-card.locked { opacity: 0.5; filter: grayscale(0.8); }
+.badge-emoji { font-size: 36px; margin-bottom: 8px; }
+.badge-title { font-family: var(--font-display); font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.badge-xp { font-family: var(--font-mono); font-size: 10px; color: var(--accent-saffron); }
+.badge-progress { margin-top: 8px; }
+.badge-progress-bar { height: 4px; border-radius: 2px; background: var(--card-border); overflow: hidden; }
+.badge-progress-fill { height: 100%; border-radius: 2px; background: var(--accent-teal); }
+
+@media(max-width:768px){
+  .dash-layout{grid-template-columns:1fr;}
+  .dash-sidebar{display:none;}
+  .dash-main{padding:20px;}
+  .dash-stats{grid-template-columns:repeat(2,1fr);}
+}

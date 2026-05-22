@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore Skills — SkillSwap</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/modal.css">
+  <link rel="stylesheet" href="styles/animations.css">
+  <style>
+    /* ═══════════════════════════════════════════════════
+       EXPLORE PAGE — Inline styles
+    ═══════════════════════════════════════════════════ */
+
+    /* ── Hero Search Section ── */
+    .explore-hero {
+      background: var(--bg-deep);
+      padding: calc(var(--nav-height) + 48px) 48px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .explore-hero::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+      background: linear-gradient(to top, var(--bg-page), transparent);
+      pointer-events: none;
+    }
+    .explore-hero-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .explore-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
+      line-height: 1.15;
+    }
+    .explore-hero h1 em {
+      font-style: italic;
+      color: transparent;
+      -webkit-text-stroke: 1.2px rgba(255,255,255,.5);
+    }
+    .explore-hero .hero-sub {
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: rgba(255,255,255,.45);
+      font-style: italic;
+      margin-bottom: 28px;
+    }
+
+    /* Search Bar */
+    .explore-search-wrap {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto 24px;
+    }
+    .explore-search-wrap input {
+      width: 100%;
+      padding: 16px 52px 16px 22px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      border: 1.5px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      outline: none;
+      transition: border-color .25s, box-shadow .25s, background .25s;
+      backdrop-filter: blur(8px);
+    }
+    .explore-search-wrap input::placeholder { color: rgba(255,255,255,.3); font-style: italic; }
+    .explore-search-wrap input:focus {
+      border-color: var(--accent-saffron);
+      box-shadow: 0 0 0 4px rgba(232,160,32,.12);
+      background: rgba(255,255,255,.08);
+    }
+    .explore-search-icon {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,.35);
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    /* Filter Pills */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+    .filter-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 100px;
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.5);
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      user-select: none;
+    }
+    .filter-pill:hover { border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.7); }
+    .filter-pill.active {
+      border-color: var(--accent-saffron);
+      color: var(--accent-saffron);
+      background: rgba(232,160,32,.08);
+    }
+    .filter-pill select {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 12px;
+    }
+    .filter-pill select option {
+      background: var(--bg-deep);
+      color: #fff;
+      font-family: var(--font-mono);
+    }
+    .filter-pill-arrow { font-size: 8px; opacity: .6; }
+
+    .filter-pill input[type="number"] {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: transparent;
+      border: none;
+      color: inherit;
+      width: 48px;
+      text-align: center;
+      outline: none;
+    }
+    .filter-pill input[type="number"]::placeholder { color: rgba(255,255,255,.3); }
+    .filter-pill input[type="number"]::-webkit-outer-spin-button,
+    .filter-pill input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    .swap-toggle {
+      width: 32px;
+      height: 18px;
+      border-radius: 100px;
+      background: rgba(255,255,255,.15);
+      position: relative;
+      cursor: pointer;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+    .swap-toggle::after {
+      content: '';
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform .2s var(--ease-spring);
+    }
+    .swap-toggle.on { background: var(--accent-teal); }
+    .swap-toggle.on::after { transform: translateX(14px); }
+
+    /* ── Results Info ── */
+    .explore-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 48px 80px;
+    }
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .results-count {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .results-count strong { color: var(--ink-primary); font-weight: 600; }
+
+    /* Category Pills Row */
+    .category-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .cat-pill {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border: 1px solid var(--card-border);
+      border-radius: 100px;
+      background: var(--card-bg);
+      color: var(--ink-faint);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .cat-pill:hover { border-color: var(--accent-saffron); color: var(--accent-saffron); }
+    .cat-pill.active {
+      background: var(--accent-saffron);
+      border-color: var(--accent-saffron);
+      color: var(--bg-deep);
+      font-weight: 500;
+    }
+
+    /* ── Skills Grid ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    /* Skill Card */
+    .skill-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 28px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      transition: transform .35s var(--ease-spring), box-shadow .35s var(--ease-out-expo);
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent-teal), var(--accent-saffron));
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .skill-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+    .skill-card:hover::before { opacity: 1; }
+
+    .skill-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .skill-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+      flex-shrink: 0;
+      position: relative;
+      border: 2px solid rgba(255,255,255,.3);
+      overflow: hidden;
+    }
+    .skill-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-grad-1 { background: linear-gradient(135deg, var(--accent-saffron), #E86420); }
+    .avatar-grad-2 { background: linear-gradient(135deg, var(--accent-teal), #0AA89B); }
+    .avatar-grad-3 { background: linear-gradient(135deg, var(--accent-rose), #A33D5B); }
+    .avatar-grad-4 { background: linear-gradient(135deg, #6C5CE7, #A29BFE); }
+    .avatar-grad-5 { background: linear-gradient(135deg, #0984E3, #74B9FF); }
+
+    .verified-dot {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--accent-teal);
+      border: 2px solid var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: #fff;
+    }
+
+    .skill-card-info { flex: 1; min-width: 0; }
+    .skill-card-name {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      margin-bottom: 2px;
+      line-height: 1.3;
+    }
+    .skill-card-uni {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    .skill-card-skill {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--ink-primary);
+      margin-bottom: 10px;
+      letter-spacing: -.3px;
+    }
+
+    .skill-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .skill-card-meta .skill-tag { font-size: 10px; padding: 3px 8px; }
+
+    .skill-card-stars {
+      font-size: 13px;
+      color: var(--accent-saffron);
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .skill-card-stars .rating-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-faint);
+      letter-spacing: 0;
+    }
+
+    .skill-card-price {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: .5px;
+      color: var(--ink-muted);
+    }
+    .skill-card-price strong {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink-primary);
+    }
+    .skill-card-price .free-badge {
+      background: rgba(14,124,108,.08);
+      color: var(--accent-teal);
+      border: 1px solid rgba(14,124,108,.25);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .skill-card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid rgba(221,213,192,.5);
+    }
+    .skill-card-bottom .btn-primary {
+      padding: 10px 22px;
+      font-size: 12px;
+      letter-spacing: .3px;
+    }
+
+    /* ── Loading Skeletons ── */
+    .skeleton-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 28px 24px 24px;
+    }
+    .skeleton-card .skel-top {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .skel-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+    }
+    .skel-lines { flex: 1; }
+    .skel-line {
+      height: 12px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .skel-line.w60 { width: 60%; }
+    .skel-line.w40 { width: 40%; }
+    .skel-line.w80 { width: 80%; }
+    .skel-line.w100 { width: 100%; }
+    .skel-title { height: 18px; border-radius: 4px; width: 70%; margin-bottom: 12px; }
+    .skel-tags { display: flex; gap: 8px; margin-bottom: 14px; }
+    .skel-tag { height: 22px; width: 60px; border-radius: 4px; }
+    .skel-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid rgba(221,213,192,.5); }
+    .skel-price { height: 20px; width: 60px; border-radius: 4px; }
+    .skel-btn { height: 36px; width: 110px; border-radius: 4px; }
+
+    /* ── Empty State ── */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      grid-column: 1 / -1;
+    }
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: .6;
+    }
+    .empty-state h3 {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--ink-primary);
+      margin-bottom: 8px;
+    }
+    .empty-state p {
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--ink-faint);
+      font-style: italic;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .explore-hero { padding: calc(var(--nav-height) + 28px) 20px 40px; }
+      .explore-content { padding: 28px 20px 60px; }
+      .filter-bar { gap: 6px; }
+      .filter-pill { padding: 6px 12px; font-size: 10px; }
+      .skills-grid { grid-template-columns: 1fr; gap: 16px; }
+      .results-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scroll Progress -->
+  <div id="scroll-progress"></div>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Background -->
+  <div class="bg-canvas">
+    <div class="bokeh-wrap">
+      <div class="bokeh"></div>
+      <div class="bokeh"></div>
+      <div class="bokeh"></div>
+      <div class="bokeh"></div>
+      <div class="bokeh"></div>
+      <div class="bokeh"></div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="/" class="nav-logo">Skill<span>Swap</span></a>
+    <ul class="nav-links">
+      <li><a href="/explore.html" class="active">Explore</a></li>
+      <li><a href="/#how">How It Works</a></li>
+      <li><a href="/#teachers">Top Teachers</a></li>
+      <li><a href="#" class="nav-cta" onclick="openAuthModal();return false;">Get Started Free</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Search -->
+  <section class="explore-hero">
+    <div class="explore-hero-inner">
+      <h1>Find Your Next <em>Skill</em></h1>
+      <p class="hero-sub">Browse hundreds of teachers across campuses — learn anything, teach everything</p>
+      <div class="explore-search-wrap">
+        <input type="text" id="exploreSearch" placeholder="Search skills, subjects, or teachers…" autocomplete="off">
+        <span class="explore-search-icon">🔍</span>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-pill" id="filterCategory">
+          <select id="categorySelect">
+            <option value="">All Categories</option>
+          </select>
+          <span class="filter-pill-arrow">▾</span>
+        </div>
+        <div class="filter-pill" id="filterPriceMin">
+          <span>₹</span>
+          <input type="number" id="priceMin" placeholder="Min" min="0">
+          <span>–</span>
+          <input type="number" id="priceMax" placeholder="Max" min="0">
+        </div>
+        <div class="filter-pill" id="filterRating">
+          <span>★</span>
+          <select id="ratingSelect">
+            <option value="">Any Rating</option>
+            <option value="4.5">4.5+</option>
+            <option value="4">4.0+</option>
+            <option value="3.5">3.5+</option>
+            <option value="3">3.0+</option>
+          </select>
+          <span class="filter-pill-arrow">▾</span>
+        </div>
+        <div class="filter-pill" id="filterSwap" onclick="toggleSwapFilter()">
+          <span>Swap Only</span>
+          <div class="swap-toggle" id="swapToggle"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="explore-content">
+    <!-- Category pills -->
+    <div class="category-pills" id="categoryPills"></div>
+
+    <!-- Results header -->
+    <div class="results-header" style="margin-top: 20px;">
+      <span class="results-count" id="resultsCount">Loading…</span>
+    </div>
+
+    <!-- Skills grid -->
+    <div class="skills-grid" id="skillsGrid">
+      <!-- Cards or skeletons rendered by JS -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">Skill<span style="color:rgba(255,255,255,.3);font-weight:400;">Swap</span></div>
+    <div class="footer-links">
+      <a href="/explore.html">Explore</a>
+      <a href="/#how">How It Works</a>
+      <a href="/#teachers">Top Teachers</a>
+    </div>
+    <p class="footer-text">"The art of teaching is the art of assisting discovery." — Mark Van Doren</p>
+  </footer>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/booking.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/explore.js"></script>
+
+</body>
+</html>
