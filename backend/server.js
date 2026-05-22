@@ -1,10 +1,12 @@
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
-const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+
+// Detect serverless environment — Socket.io cannot run on Vercel serverless
+const IS_SERVERLESS = !!(process.env.VERCEL || process.env.RAILWAY_ENVIRONMENT);
 
 // Route imports
 const authRoutes         = require('./routes/auth');
@@ -24,9 +26,16 @@ initDB();
 
 const app    = express();
 const server = http.createServer(app);
-const io     = new Server(server, {
-  cors: { origin: '*', methods: ['GET','POST'] }
-});
+
+// Socket.io — only loaded when NOT on Vercel serverless
+let io = null;
+if (!IS_SERVERLESS) {
+  const { Server } = require('socket.io');
+  io = new Server(server, {
+    cors: { origin: '*', methods: ['GET','POST'] }
+  });
+}
+
 
 // ── Middleware ──────────────────────────────────────────────
 app.use(cors());
@@ -88,75 +97,53 @@ if (!process.env.VERCEL) {
   });
 }
 
-// ── Socket.io Real-time ─────────────────────────────────────
-const { initSocket } = require('./utils/notificationHelper');
-initSocket(io);
 
-const db = require('./database/db').getDB();
+// ── Socket.io Real-time (local only — not available on Vercel serverless) ──
+if (!IS_SERVERLESS && io) {
+  const { initSocket } = require('./utils/notificationHelper');
+  initSocket(io);
 
-io.on('connection', (socket) => {
-  console.log(`🔌 Socket connected: ${socket.id}`);
+  const db = require('./database/db').getDB();
 
-  // Auth: associate socket with user
-  socket.on('authenticate', (userId) => {
-    socket.userId = userId;
-    socket.join(`user_${userId}`);
-    console.log(`👤 User ${userId} authenticated on socket`);
-    // Broadcast online status
-    socket.broadcast.emit('user_online', { userId });
+  io.on('connection', (socket) => {
+    console.log(`🔌 Socket connected: ${socket.id}`);
+
+    socket.on('authenticate', (userId) => {
+      socket.userId = userId;
+      socket.join(`user_${userId}`);
+      socket.broadcast.emit('user_online', { userId });
+    });
+
+    socket.on('join_room', ({ roomId }) => {
+      socket.join(roomId);
+    });
+
+    socket.on('send_message', ({ roomId, senderId, receiverId, content, type = 'text' }) => {
+      const { v4: uuidv4 } = require('uuid');
+      const msgId = uuidv4();
+      const now   = new Date().toISOString();
+      try {
+        db.prepare(`INSERT INTO messages (id, sender_id, receiver_id, content, type, read, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)`)
+          .run(msgId, senderId, receiverId, content, type, now);
+        const message = { id: msgId, senderId, receiverId, content, type, read: false, createdAt: now };
+        io.to(roomId).emit('message_received', message);
+        io.to(`user_${receiverId}`).emit('notification', { type: 'new_message', message: 'New message from a peer', payload: { senderId, roomId } });
+        db.prepare(`INSERT INTO notifications (id, user_id, type, payload_json, read, created_at) VALUES (?, ?, 'new_message', ?, 0, ?)`)
+          .run(uuidv4(), receiverId, JSON.stringify({ senderId, roomId }), now);
+      } catch (err) {
+        console.error('Message save error:', err);
+      }
+    });
+
+    socket.on('typing',      ({ roomId, userId }) => socket.to(roomId).emit('user_typing',      { userId }));
+    socket.on('stop_typing', ({ roomId, userId }) => socket.to(roomId).emit('user_stop_typing', { userId }));
+
+    socket.on('disconnect', () => {
+      if (socket.userId) socket.broadcast.emit('user_offline', { userId: socket.userId });
+    });
   });
+}
 
-  // Join private chat room
-  socket.on('join_room', ({ roomId }) => {
-    socket.join(roomId);
-    console.log(`💬 Socket ${socket.id} joined room ${roomId}`);
-  });
-
-  // Send message
-  socket.on('send_message', ({ roomId, senderId, receiverId, content, type = 'text' }) => {
-    const { v4: uuidv4 } = require('uuid');
-    const msgId = uuidv4();
-    const now   = new Date().toISOString();
-
-    try {
-      db.prepare(`
-        INSERT INTO messages (id, sender_id, receiver_id, content, type, read, created_at)
-        VALUES (?, ?, ?, ?, ?, 0, ?)
-      `).run(msgId, senderId, receiverId, content, type, now);
-
-      const message = { id: msgId, senderId, receiverId, content, type, read: false, createdAt: now };
-
-      // Emit to room
-      io.to(roomId).emit('message_received', message);
-
-      // Push notification to receiver
-      io.to(`user_${receiverId}`).emit('notification', {
-        type: 'new_message',
-        message: `New message from a peer`,
-        payload: { senderId, roomId }
-      });
-
-      // Persist notification
-      db.prepare(`
-        INSERT INTO notifications (id, user_id, type, payload_json, read, created_at)
-        VALUES (?, ?, 'new_message', ?, 0, ?)
-      `).run(uuidv4(), receiverId, JSON.stringify({ senderId, roomId }), now);
-
-    } catch (err) {
-      console.error('Message save error:', err);
-    }
-  });
-
-  // Typing indicators
-  socket.on('typing',      ({ roomId, userId }) => socket.to(roomId).emit('user_typing',      { userId }));
-  socket.on('stop_typing', ({ roomId, userId }) => socket.to(roomId).emit('user_stop_typing', { userId }));
-
-  // Disconnect
-  socket.on('disconnect', () => {
-    if (socket.userId) socket.broadcast.emit('user_offline', { userId: socket.userId });
-    console.log(`🔌 Socket disconnected: ${socket.id}`);
-  });
-});
 
 // ── Start ───────────────────────────────────────────────────
 // On Vercel: do NOT call server.listen() — Vercel provides its own HTTP server.
