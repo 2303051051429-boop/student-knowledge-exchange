@@ -135,7 +135,9 @@ function initDB() {
   if (userCount.c === 0) {
     console.log('🌱 Auto-seeding demo data...');
     const bcrypt = require('bcryptjs');
-    const password = bcrypt.hashSync('password123', 10);
+    // Use cost 4 on serverless — cost 10 blocks ~400ms+ and risks cold-start timeout.
+    const bcryptCost = IS_SERVERLESS ? 4 : 10;
+    const password = bcrypt.hashSync('password123', bcryptCost);
     const now = new Date().toISOString();
     const users = [
       { id: 'u1',   name: 'Aryan Mehta',    email: 'aryan@iitb.ac.in',    university: 'IIT Bombay',       bio: 'CS student passionate about web dev & DSA.',         credits: 450, xp: 1240, sessions_taught: 84, avg_rating: 4.9, review_count: 84, is_verified: 1 },
