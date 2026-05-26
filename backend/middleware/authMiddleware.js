@@ -7,7 +7,8 @@ function authMiddleware(req, res, next) {
   }
   const token = header.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'skillswap_default_secret_key';
+    const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch {

@@ -9,9 +9,10 @@ const { authLimiter } = require('../middleware/rateLimiter');
 const router = express.Router();
 
 function signToken(user) {
+  const secret = process.env.JWT_SECRET || 'skillswap_default_secret_key';
   return jwt.sign(
     { id: user.id, email: user.email, name: user.name },
-    process.env.JWT_SECRET,
+    secret,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
 }
