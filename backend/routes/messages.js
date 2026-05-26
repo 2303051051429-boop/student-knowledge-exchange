@@ -44,4 +44,27 @@ router.get('/', auth, (req, res) => {
   res.json({ conversations: convos });
 });
 
+// POST /api/messages — Send a message via REST (serverless fallback)
+router.post('/', auth, (req, res) => {
+  const db = getDB();
+  const { v4: uuidv4 } = require('uuid');
+  const { receiverId, content } = req.body;
+  if (!receiverId || !content) return res.status(400).json({ error: 'receiverId and content required' });
+
+  const id = uuidv4();
+  const now = new Date().toISOString();
+
+  db.prepare('INSERT INTO messages (id, sender_id, receiver_id, content, type, read, created_at) VALUES (?,?,?,?,?,0,?)')
+    .run(id, req.user.id, receiverId, content, 'text', now);
+
+  res.status(201).json({ message: { id, sender_id: req.user.id, receiver_id: receiverId, content, type: 'text', read: 0, created_at: now } });
+});
+
+// PATCH /api/messages/:partnerId/read — Mark messages as read
+router.patch('/:partnerId/read', auth, (req, res) => {
+  const db = getDB();
+  db.prepare('UPDATE messages SET read = 1 WHERE receiver_id = ? AND sender_id = ?').run(req.user.id, req.params.partnerId);
+  res.json({ success: true });
+});
+
 module.exports = router;

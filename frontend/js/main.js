@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ── Custom Cursor ───────────────────────────────────
 function initCursor() {
   if ('ontouchstart' in window) return;
-  document.body.style.cursor = 'none';
+  // Keep system cursor visible — custom cursor is just a decorative overlay
   const dot = document.getElementById('cursorDot');
   const ring = document.getElementById('cursorRing');
   if (!dot || !ring) return;
