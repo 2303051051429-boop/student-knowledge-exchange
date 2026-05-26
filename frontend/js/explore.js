@@ -31,12 +31,17 @@
 
   // ── Init ──
   document.addEventListener('DOMContentLoaded', () => {
-    // Read ?q= from URL
+    // Read ?q= and ?category= from URL
     const params = new URLSearchParams(window.location.search);
     const urlQuery = params.get('q') || '';
+    const urlCategory = params.get('category') || '';
     if (urlQuery) {
       filters.q = urlQuery;
       if (searchInput) searchInput.value = urlQuery;
+    }
+    if (urlCategory) {
+      filters.category = urlCategory;
+      if (categorySelect) categorySelect.value = urlCategory;
     }
 
     loadCategories();
@@ -250,21 +255,20 @@
   }
 
   function renderSkillCard(skill, index) {
-    const teacher = skill.teacher || skill.user || {};
-    const teacherName = teacher.name || skill.teacherName || 'Unknown Teacher';
-    const university = teacher.university || skill.university || '';
-    const avatar = teacher.avatar || skill.avatar || '';
+    const teacherName = skill.teacher_name || skill.teacherName || 'Unknown Teacher';
+    const university = skill.university || '';
+    const avatar = skill.avatar || '';
     const initials = teacherName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     const gradients = ['avatar-grad-1', 'avatar-grad-2', 'avatar-grad-3', 'avatar-grad-4', 'avatar-grad-5'];
     const gradClass = gradients[index % gradients.length];
-    const verified = teacher.verified || skill.verified || false;
+    const verified = skill.is_verified || false;
     const category = skill.category || 'General';
-    const rating = skill.rating || skill.avgRating || 0;
-    const reviewCount = skill.reviewCount || skill.reviews || 0;
-    const price = skill.price != null ? skill.price : 0;
-    const skillName = skill.name || skill.skillName || skill.title || 'Untitled Skill';
-    const teacherId = teacher._id || teacher.id || skill.teacherId || skill.userId || '';
-    const skillId = skill._id || skill.id || '';
+    const rating = skill.avg_rating || 0;
+    const reviewCount = skill.review_count || 0;
+    const price = skill.price_per_hr != null ? skill.price_per_hr : 0;
+    const skillName = skill.name || 'Untitled Skill';
+    const teacherId = skill.user_id || '';
+    const skillId = skill.id || '';
 
     // Tag color
     const tagColors = { 'Programming': 'tag-teal', 'Music': 'tag-saffron', 'Design': 'tag-rose', 'Languages': 'tag-teal', 'Science': 'tag-saffron', 'Business': 'tag-teal', 'Arts': 'tag-rose', 'Sports': 'tag-saffron' };

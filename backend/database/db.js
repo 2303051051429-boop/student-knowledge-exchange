@@ -1,6 +1,6 @@
 const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 // On Vercel: use in-memory SQLite (:memory:) to avoid EROFS filesystem errors.
 // Data auto-seeds on every cold start (demo data is always fresh).

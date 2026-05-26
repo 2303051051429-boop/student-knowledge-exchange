@@ -31,19 +31,19 @@
       "dest": "frontend/$1"
     },
     {
-      "src": "/explore",
+      "src": "/explore(\\.html)?",
       "dest": "frontend/explore.html"
     },
     {
-      "src": "/dashboard",
+      "src": "/dashboard(\\.html)?",
       "dest": "frontend/dashboard.html"
     },
     {
-      "src": "/messages",
+      "src": "/messages(\\.html)?",
       "dest": "frontend/messages.html"
     },
     {
-      "src": "/leaderboard",
+      "src": "/leaderboard(\\.html)?",
       "dest": "frontend/leaderboard.html"
     },
     {
